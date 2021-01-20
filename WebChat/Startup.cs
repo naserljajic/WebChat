@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using WebChat.Factory;
 using WebChat.Models;
 
 namespace WebChat
@@ -36,9 +37,11 @@ namespace WebChat
                 opt.Password.RequireUppercase = false;
                 opt.User.RequireUniqueEmail = true;
             })
- .AddEntityFrameworkStores<ApplicationContext>();
+                .AddEntityFrameworkStores<ApplicationContext>();
             services.AddControllersWithViews();
             services.AddAutoMapper(typeof(Startup));
+            services.ConfigureApplicationCookie(o => o.LoginPath = "/Nalog/Prijava");
+            services.AddScoped<IUserClaimsPrincipalFactory<Korisnik>, CustomClaimsFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,7 +61,7 @@ namespace WebChat
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

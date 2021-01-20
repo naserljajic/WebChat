@@ -13,10 +13,12 @@ namespace WebChat.Controllers
     {
         private readonly IMapper _mapper;
         private readonly UserManager<Korisnik> _userManager;
-        public NalogController(IMapper mapper, UserManager<Korisnik> userManager)
+        private readonly SignInManager<Korisnik> _signInManager;
+        public NalogController(IMapper mapper, UserManager<Korisnik> userManager, SignInManager<Korisnik> signInManager)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _signInManager = signInManager;
         }
 
         [HttpGet]
@@ -56,6 +58,48 @@ namespace WebChat.Controllers
 
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
+        [HttpGet]
+        public IActionResult Prijava(string returnUrl= null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Prijava(KorisnikLoginModel userModel, string returnUrl = null)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View(userModel);
+            }
+            var result = await _signInManager.PasswordSignInAsync(userModel.KorisnickoIme, userModel.Sifra, userModel.ZapamtiMe, false);
+            if (result.Succeeded)
+            {
+                return RedirectToLocal(returnUrl);
+            }
+            else
+            {
+                ModelState.AddModelError("", "Korisnicko ime ili sifra nisu tacno uneti!");
+                return View();
+            }
+            
+        }
+        private IActionResult RedirectToLocal(string returnUrl)
+        {
+            if (Url.IsLocalUrl(returnUrl))
+                return Redirect(returnUrl);
+            else
+                return RedirectToAction(nameof(HomeController.Index), "Home");
+
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> OdjaviSe()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction(nameof(HomeController.Index), "Home");
+        }
+
 
     }
 }

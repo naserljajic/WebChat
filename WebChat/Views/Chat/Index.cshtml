@@ -1,0 +1,28 @@
+﻿@model WebChat.Models.Korisnik
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<Korisnik> SignInManager
+@inject UserManager<Korisnik> UserManager
+
+
+@{
+    ViewData["Title"] = "Chat";
+}
+<h1>Chat </h1>
+@if (SignInManager.IsSignedIn(User))
+{
+    @if (User.IsInRole("Admin"))
+    {
+        <h1>Ti si ADMIN</h1>
+    }
+    else if (User.IsInRole("Moderator"))
+    {
+        <h1> Ti si moderator</h1>
+
+    }else
+    {
+        <h1> Ti si korisnik</h1>
+    }
+
+
+}
+
