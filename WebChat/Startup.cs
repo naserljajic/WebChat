@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -28,9 +29,16 @@ namespace WebChat
         {
             services.AddDbContext<ApplicationContext>(opts =>
             opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection")));
-            services.AddIdentity<Korisnik, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationContext>();
+            services.AddIdentity<Korisnik, IdentityRole>(opt =>
+            {
+                opt.Password.RequiredLength = 5;
+                opt.Password.RequireDigit = false;
+                opt.Password.RequireUppercase = false;
+                opt.User.RequireUniqueEmail = true;
+            })
+ .AddEntityFrameworkStores<ApplicationContext>();
             services.AddControllersWithViews();
+            services.AddAutoMapper(typeof(Startup));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
