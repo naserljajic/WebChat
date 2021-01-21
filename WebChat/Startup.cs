@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebChat.Factory;
 using WebChat.Models;
+using WebChat.Hubs;
 
 namespace WebChat
 {
@@ -28,6 +29,7 @@ namespace WebChat
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR();
             services.AddDbContext<ApplicationContext>(opts =>
             opts.UseSqlServer(Configuration.GetConnectionString("sqlConnection")));
             services.AddIdentity<Korisnik, IdentityRole>(opt =>
@@ -69,6 +71,7 @@ namespace WebChat
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapHub<ChatHub>("/chathub");
             });
         }
     }

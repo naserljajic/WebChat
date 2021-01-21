@@ -9,7 +9,7 @@ namespace WebChat.Controllers
 {
     public class ChatController : Controller
     {
-       
+       [Authorize]
         public IActionResult Index()
         {
             return View();
